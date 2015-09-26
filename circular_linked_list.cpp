@@ -75,12 +75,10 @@ public:
         T remove() {
             if (itr == NULL) { throw std::invalid_argument("Iterator refers to a NULL pointer");}
 
-            // std::cout << "iterator remove" << std::endl;
             Element* elementToDelete = itr;
             operator++();
             T val = list.remove(elementToDelete);
             endFlag = !(list.getSize());
-            // std::cout << val << std::endl;
             return val;
         }
 
@@ -91,7 +89,7 @@ public:
 
             do {
                 Element * newItr = itr->getChildElement();
-                if (itr == list.head) { endFlag = true; return *this;}
+                if (itr == list.head) {endFlag = true;}
                 itr = newItr;
             } while (itr == list.head);
 
@@ -182,6 +180,8 @@ public:
 
             index++;
         }
+
+        return -1;
     }
 
  public:
@@ -264,19 +264,15 @@ public:
         T val = elementToDelete->getData();
 
         if (getSize() == 1) {
-            // std::cout << "empty" << std::endl;
             tail = head;
             head->setChildElement(head);
         } else if (!position) {
-            // std::cout << "head but not empty" << std::endl;
             head->setChildElement(getElement(1));
         } else if (position == getSize() - 1) {
-            // std::cout << "middle or end but not empty" << std::endl;
-            getElement(position - 1)->setChildElement(getElement(position + 1));
-        } else {
-            // std::cout << "end but not empty" << std::endl;
             tail = getElement(getSize() - 2);
             tail->setChildElement(head);
+        } else {
+            getElement(position - 1)->setChildElement(getElement(position + 1));
         }
 
         size--;
