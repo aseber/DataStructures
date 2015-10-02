@@ -89,7 +89,7 @@ class linked_list {
         iterator& operator++() {
             if (itr == NULL) { throw std::invalid_argument("Iterator refers to a NULL pointer");}
 
-            itr = itr->getChildNode();
+            itr = itr->getNext();
             return *this;
         }
 
@@ -173,7 +173,7 @@ class linked_list {
         if (position > (size() - 1)) {
             // Throw error
             std::ostringstream stream;
-            stream << "linked_list getNode failed (position = " << position << ", internalSize = " << size() << ")";
+            stream << "linked_list getForwardNode failed (position = " << position << ", internalSize = " << size() << ")";
             std::cerr << stream.str() << std::endl;
             throw std::out_of_range(stream.str());
         }
@@ -199,7 +199,7 @@ class linked_list {
         int index = 0;
         iterator it = iterator(*this, begin());
 
-        for (; !it.endPassed(); it++) {
+        for (; it != end(); it++) {
             if (it == node) {
                 return index;
             }
@@ -224,43 +224,31 @@ class linked_list {
             throw std::out_of_range(stream.str());
         }
 
-        Node * newNode = new Node(object);
+        Node* newNode = new Node(object);
 
-        if (position == 0 && size() == 0) {   // Header && internalSize == 0
+        if (!size()) {
             head = newNode;
             tail = newNode;
-            internalSize++;
-            return true;
-        }
-
-        if (position == 0 && size() > 0) {    // Header && internalSize > 0
+        } else if (!position) {
             newNode->setNext(head);
             head->setPrevious(newNode);
             head = newNode;
-            internalSize++;
-            return true;
-        }
-
-        if (position < (size() - 1) && position != 0) {   // Middle
-            newNode->setNext(getForwardNode(position));
-            newNode->setPrevious(getForwardNode(position - 1));
-            getForwardNode(position - 1)->setNext(newNode);
-            getForwardNode(position + 1)->setPrevious(newNode);
-            internalSize++;
-            return true;
-        }
-
-        if (position == size() && size() > 0) {    // Tail
+        } else if (position  == size()) {
             newNode->setPrevious(tail);
-            getNode(position - 1)->setNext(newNode);
+            tail->setNext(newNode);
             tail = newNode;
-            internalSize++;
-            return true;
+        } else {
+            Node* current = getNode(position);
+            Node* previous = current->getPrevious();
+            Node* next = current->getNext();
+            newNode->setNext(current);
+            newNode->setPrevious(previous);
+            previous->setNext(newNode);
+            current->setPrevious(newNode);
         }
 
-        std::cout << "WARNING! Insert not handled!" << std::endl;
-
-        return false;
+        internalSize++;
+        return true;
     }
 
     bool insert(const int& position, const T* object) {
@@ -301,11 +289,11 @@ class linked_list {
         return false;
     }
 
-    const Node* begin() const {
+    Node* begin() const {
         return head;
     }
 
-    const Node* end() const {
+    Node* end() const {
         return tail;
     }
 
@@ -344,21 +332,15 @@ class linked_list {
         if (position == 0 && size() == 1) {   // Head, Size == 1
             head = NULL;
             tail = NULL;
-        }
-
-        if (position == 0 && size() > 1) {    // Head, Size > 1
+        } else if (position == 0 && size() > 1) {    // Head, Size > 1
             head = getNode(1);
             head->setPrevious(NULL);
-        }
-
-        if (position < (size() - 1) && position != 0) {   // Middle
+        } else if (position < (size() - 1) && position != 0) {   // Middle
             getNode(position - 1)->setNext(getNode(position + 1));
             getNode(position)->setPrevious(getNode(position - 1));
-        }
-
-        if (position == (size() - 1)) {   // Tail
-            getNode(position - 1)->setNext(NULL);
+        } else if (position == (size() - 1)) {   // Tail
             tail = getNode(position - 1);
+            tail->setNext(NULL);
         }
 
         internalSize--;
@@ -391,8 +373,7 @@ std::ostream& operator<< (std::ostream& os, linked_list<T>& list) {
     std::stringstream newSS;
     typename linked_list<T>::iterator it = list.getIterator(list.begin());
     ss << "[";
-
-    for (; !it.endPassed(); it++) {
+    for (; it != NULL; it++) {
         ss << *it << ", ";
     }
 
