@@ -3,10 +3,6 @@
 #ifndef SEBER_CIRCULAR_LINKED_LIST
 #define SEBER_CIRCULAR_LINKED_LIST
 
-// Should make begin() and end return constant I think
-// issue with clear(); with last element!
-// print fails when you add and remove all elements
-
 template <typename T>
 class circular_linked_list {
     class Node {

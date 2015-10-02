@@ -88,7 +88,7 @@ public:
             if (itr == NULL) { throw std::invalid_argument("Iterator refers to a NULL pointer");}
 
             do {
-                Node * newItr = itr->getChildNode();
+                Node* newItr = itr->getChildNode();
                 if (itr == list.head) {endFlag = true;}
                 itr = newItr;
             } while (itr == list.head);
@@ -185,12 +185,11 @@ public:
     }
 
  public:
-    circular_linked_list() : head(new Node(T())), tail(NULL), internalSize(1) {
-        tail = head;
+    circular_linked_list() : head(new Node(T())), tail(head), internalSize(1) {
         head->setChildNode(head);
     }
 
-    ~circular_linked_list() { clear(); }
+    ~circular_linked_list() { empty(); }
 
     bool insert(const int& position, const T& object) {
         if (position < 0 || position > size()) {
@@ -260,7 +259,7 @@ public:
             throw std::out_of_range(stream.str());
         }
 
-        Node * nodeToDelete = getNode(position);
+        Node* nodeToDelete = getNode(position);
         T val = nodeToDelete->getData();
 
         if (size() == 1) {
@@ -282,7 +281,7 @@ public:
 
     const int size() const { return internalSize - 1; }
 
-    void clear() {
+    void empty() {
         iterator it = getIterator(begin());
 
         for (; !it.endPassed();) {

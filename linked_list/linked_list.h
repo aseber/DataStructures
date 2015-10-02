@@ -1,15 +1,3 @@
-/*
-*
-* Name: Austin Seber
-*
-* UFID: 01516234
-*
-* Gator ID: aseber
-*
-* Discussion Section: 13A8
-*
-*/
-
 // Doubly linked list
 
 #ifndef SEBER_LINKED_LIST
@@ -31,8 +19,6 @@ class linked_list {
         bool operator!= (const Node& rhs);
         const T& operator*() const;
         const T& operator->() const;
-        // Node& operator= (Node rhs);
-        // bool setData(const T data);
     };
 
  public:
@@ -42,7 +28,6 @@ class linked_list {
         iterator(circular_linked_list<T>& tempList, Node* temp);
         iterator(const iterator& newItr);
         T remove();
-        const bool& endPassed() const;
         iterator& operator++();
         iterator operator++(int);
         iterator& operator=(const Node* newItr);
@@ -57,20 +42,18 @@ class linked_list {
 
  private:
     const Node* getNode(const int& position) const;
-    T remove(Node* node);
     const Node* getForwardNode(const int& position) const;
+    T remove(Node* node);
     const int& getIndex(Node* node) const;
 
  public:
     linked_list();
     ~linked_list();
-    // bool operator!= (const linked_list<T> & rhs);
-    // bool operator== (const linked_list<T> & rhs);
-    // linked_list<T> & operator= (const linked_list<T> & rhs);
-    // linked_list<T> & operator+ (linked_list<T> & rhs);
     bool insert(const int& position, const T& object);
     bool insert(const int& position, const T* object);
+    bool replace(const int& position, const T& data);
     const T& item_at(const int & position) const;
+    bool contains(const T& object);
     const Node* begin() const;
     const Node* end() const;
     iterator getIterator(Node* element);
@@ -79,13 +62,9 @@ class linked_list {
     T pop_front();
     T pop_back();
     T remove(const int& position);
-    // int findNode(const T& node, const int & position = 0);
-    // linked_list<int> findAllNodes(const T & node);
-    // int findNumAllNodes(const T & node);
     const int size() const;
-    // bool replace(const int& position, const T& data);
-    // bool contains(const T& object);
-    bool empty();
+    void empty();
+    bool isEmpty();
     friend std::ostream& operator<< (std::ostream& os, const circular_linked_list<T>& list);
 };
 

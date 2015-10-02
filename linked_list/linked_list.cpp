@@ -1,15 +1,3 @@
-/*
-*
-* Name: Austin Seber
-*
-* UFID: 01516234
-*
-* Gator ID: aseber
-*
-* Discussion Section: 13A8
-*
-*/
-
 #include <stdexcept>
 #include <iostream>
 #include <string>
@@ -19,19 +7,45 @@
 template <typename T>
 class linked_list {
     class Node {
-        T object;
-        Node * parent;
-        Node * child;
+        const T* object;
+        Node* previous;
+        Node* next;
 
      public:
-        Node(const T data, Node * parentNode = 0, Node * childNode = 0) : object(data), parent(parentNode), child(childNode) {}
+        Node(const T& data, Node* tempPrevious = 0, Node* tempNext = 0) : object(new T(data)), previous(tempPrevious), next(tempNext) {}
+
         ~Node() {
-            parent = NULL;
-            child = NULL;
+            delete object;
+            previous = NULL;
+            next = NULL;
+        }
+
+        const T& getData() const {
+            return *object;
+        }
+
+        Node* getNext() const {
+            return next;
+        }
+
+        void setNext(Node* tempNext) {
+            next = tempNext;
+        }
+
+        Node* getPrevious() const {
+            return previous;
+        }
+
+        void setPrevious(Node* tempPrevious) {
+            previous = tempPrevious;
+        }
+
+        void print(std::ostream& stream) const {
+            stream << getData();
         }
 
         bool operator== (const Node & rhs) const {
-            if (object == rhs.getData() && parent == rhs.getParentNode() && child == rhs.getChildNode()) {
+            if (object == rhs.getData() && previous == rhs.getPrevious() && next == rhs.getNext()) {
                 return true;
             }
 
@@ -42,98 +56,112 @@ class linked_list {
             return !(*this == rhs);
         }
 
-        /*bool operator= ()
-
-        Node & operator= (Node rhs) {
-
-            if (this != &rhs) {
-
-                clear();
-
-                if (size) {
-
-                    head = rhs.getNode(0);
-                    tail = rhs.getNode(size - 1);
-                    size = rhs.getSize();
-
-                }
-
-            }
-
-            return *this;
-
-        }*/
-
-        bool setParentNode(Node * node) {
-            parent = node;
-            return true;
+        const T& operator*() const {
+            return getData();
         }
 
-        Node* getParentNode() const {
-            return parent;
-        }
-
-        bool clearParentNode() {
-            parent = NULL;
-            return true;
-        }
-
-        bool setChildNode(Node * node) {
-            child = node;
-            return true;
-        }
-
-        Node* getChildNode() const {
-            return child;
-        }
-
-        bool clearChildNode() {
-            child = NULL;
-            return true;
-        }
-
-        bool setData(const T data) {
-            object = data;
-            return true;
-        }
-
-        T getData() const {
-            return object;
-        }
-
-        void print(std::ostream & stream) const {
-            stream << object;
+        const T& operator->() const {
+            return getData();
         }
     };
 
-    Node * head;
-    Node * tail;
-    int size;
+ public:
+    class iterator : public std::iterator<std::forward_iterator_tag, Node*> {
+        linked_list<T>& list;
+        Node* itr;
 
-    Node * getNode(const int position) const {
-        if (position > (size - 1)) {
+     public:
+        iterator(linked_list<T>& tempList, const Node* temp = NULL) : list(tempList), itr(temp) {}
+
+        iterator(linked_list<T>& tempList, Node* temp = NULL) : list(tempList), itr(temp) {}
+
+        iterator(const iterator& newItr) : list(newItr.list), itr(newItr.itr) {}
+
+        T remove() {
+            if (itr == NULL) { throw std::invalid_argument("Iterator refers to a NULL pointer");}
+
+            Node* nodeToDelete = itr;
+            operator++();
+            T val = list.remove(nodeToDelete);
+            return val;
+        }
+
+        iterator& operator++() {
+            if (itr == NULL) { throw std::invalid_argument("Iterator refers to a NULL pointer");}
+
+            itr = itr->getChildNode();
+            return *this;
+        }
+
+        iterator operator++(int) {
+            iterator result(*this);
+            ++(*this);
+            return result;
+        }
+
+        iterator& operator=(const Node* newItr) {
+            itr = newItr;
+            return *this;
+        }
+
+        iterator& operator=(Node* newItr) {
+            itr = newItr;
+            return *this;
+        }
+
+        bool operator==(const iterator& rhs) const {
+            return itr == rhs.itr;
+        }
+
+        bool operator==(const Node* rhs) const {
+            return itr == rhs;
+        }
+
+        bool operator!=(const iterator& rhs) const {
+            return !(*this == rhs);
+        }
+
+        bool operator!=(const Node* rhs) const {
+            return !(*this == rhs);
+        }
+
+        const T& operator*() const {
+            return itr->getData();
+        }
+
+        const T& operator->() const {
+            return itr->getData();
+        }
+    };
+
+    Node* head;
+    Node* tail;
+    int internalSize;
+
+    Node* getNode(const int& position) const {
+        if (position > (size() - 1)) {
             // Throw error
             std::ostringstream stream;
-            stream << "linked_list getNode failed (position = " << position << ", size = " << size << ")";
+            stream << "linked_list getNode failed (position = " << position << ", internalSize = " << size() << ")";
             std::cerr << stream.str() << std::endl;
             throw std::out_of_range(stream.str());
         }
 
-        Node * currentNode;
-        if (position < size/2) {
+        Node* currentNode;
+        if (position < size()/2) {
             currentNode = head;
             int i = 0;
 
             while (i < position) {
-                currentNode = currentNode->getChildNode();
+                currentNode = currentNode->getNext();
                 i++;
             }
         } else {
             currentNode = tail;
-            int i = size - 1;
+            int i = size() - 1;
 
             while (i > position) {
-                currentNode = currentNode->getParentNode();
+                currentNode = currentNode->getPrevious();
                 i--;
             }
         }
@@ -141,167 +169,92 @@ class linked_list {
         return currentNode;
     }
 
-    Node * getBasicNode(const int position) const {
-        if (position > (size - 1)) {
+    Node* getForwardNode(const int& position) const {
+        if (position > (size() - 1)) {
             // Throw error
             std::ostringstream stream;
-            stream << "linked_list getNode failed (position = " << position << ", size = " << size << ")";
+            stream << "linked_list getNode failed (position = " << position << ", internalSize = " << size() << ")";
             std::cerr << stream.str() << std::endl;
             throw std::out_of_range(stream.str());
         }
 
-        Node * currentNode = head;
+        Node* currentNode = head;
         int i = 0;
 
         while (i < position) {
-            currentNode = currentNode->getChildNode();
+            currentNode = currentNode->getNext();
             i++;
         }
 
         return currentNode;
     }
 
+    T remove(Node* node) {
+        int index = getIndex(node);
+        return remove(index);
+    }
+
+    const int getIndex(Node* node) {
+        if (node == head) { return -1; }
+        int index = 0;
+        iterator it = iterator(*this, begin());
+
+        for (; !it.endPassed(); it++) {
+            if (it == node) {
+                return index;
+            }
+
+            index++;
+        }
+
+        return -1;
+    }
+
  public:
-    linked_list() : head(NULL), tail(NULL), size(0) {}
-    /*linked_list(std::initializer_list<T> args) : head(NULL), tail(NULL), size(0) {
-        typename std::initializer_list<T>::iterator it;
+    linked_list() : head(NULL), tail(NULL), internalSize(0) {}
 
-        for (it = args.begin(); it != args.end(); ++it) {
-            push_back(*it);
-        }
-    }*/
-    /*linked_list(linked_list<T> && other) : head(NULL), tail(NULL), size(0) {
-        for (int i = 0; i < other.getSize(); i++) {
-            push_back(other.pop_front());
-        }
-    }*/
-    linked_list(int count, const T & initial_value) : head(NULL), tail(NULL), size(0) {
-        for (int i = 0; i < count; i++) {
-            push_back(initial_value);
-        }
-    }
+    ~linked_list() { empty(); }
 
-    ~linked_list() {
-        clear();
-    }
-
-    bool operator== (const linked_list<T> & rhs) const {
-        if (size != rhs.getSize()) {
-            return false;
-        }
-
-        for (int i = 0; i < size; i++) {
-            if (getData(i) != rhs.getData(i)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    bool operator!= (const linked_list<T> & rhs) const {
-        return !(*this == rhs);
-    }
-
-    linked_list<T> & operator= (const linked_list<T> & rhs) {
-        if (this != &rhs) {
-            clear();
-
-            for (int i = 0; i < rhs.getSize(); i++) {
-                push_back(rhs.getData(i));
-            }
-
-            // head = rhs.getNode(0);
-            // tail = rhs.getNode(size - 1); // Should not set to the pointer
-            // size = rhs.getSize(); // because if we delete one, it breaks
-                                    // the other (even a copy!)
-        }
-
-        return *this;
-    }
-
-    /*linked_list<T> & operator= (linked_list<T>&& rhs) {
-
-        if (this != &rhs) {
-
-            clear();
-
-            for (int i = 0; i < rhs.getSize(); i++) {
-
-                push_back(rhs.pop_front());
-
-            }
-
-        }
-
-        return *this;
-
-    }*/
-
-    /*linked_list<T> & operator=(linked_list<T> rhs) {
-
-        if (this != &rhs) {
-
-            clear();
-
-            for (int i = 0; i < rhs.getSize(); i++) {
-
-                push_back(rhs.getData(i));
-
-            }
-
-        }
-
-    }*/// Broken? Useless?
-
-    linked_list<T> & operator+ (linked_list<T> & rhs) {
-        for (int i = 0; i < rhs.getSize(); i++) {
-            push_back(rhs.getData(i));
-        }
-
-        return *this;
-    }
-
-    bool insert(const int & position, const T & object) {
-        if (position > size || position < 0) {
+    bool insert(const int& position, const T& object) {
+        if (position > size() || position < 0) {
             // Throw error, out of bounds
             std::ostringstream stream;
-            stream << "linked_list insert failed (position = " << position << ", object = " << object << ", size = " << size << ")";
+            stream << "linked_list insert failed (position = " << position << ", object = " << object << ", internalSize = " << size() << ")";
             std::cerr << stream.str() << std::endl;
             throw std::out_of_range(stream.str());
         }
 
         Node * newNode = new Node(object);
 
-        if (position == 0 && size == 0) {   // Header && size == 0
+        if (position == 0 && size() == 0) {   // Header && internalSize == 0
             head = newNode;
             tail = newNode;
-            size++;
+            internalSize++;
             return true;
         }
 
-        if (position == 0 && size > 0) {    // Header && size > 0
-            newNode->setChildNode(head);
-            head->setParentNode(newNode);
+        if (position == 0 && size() > 0) {    // Header && internalSize > 0
+            newNode->setNext(head);
+            head->setPrevious(newNode);
             head = newNode;
-            size++;
+            internalSize++;
             return true;
         }
 
-        if (position < (size - 1) && position != 0) {   // Middle
-            newNode->setChildNode(getBasicNode(position));
-            newNode->setParentNode(getBasicNode(position - 1));
-            getBasicNode(position - 1)->setChildNode(newNode);
-            getBasicNode(position + 1)->setParentNode(newNode);
-            size++;
+        if (position < (size() - 1) && position != 0) {   // Middle
+            newNode->setNext(getForwardNode(position));
+            newNode->setPrevious(getForwardNode(position - 1));
+            getForwardNode(position - 1)->setNext(newNode);
+            getForwardNode(position + 1)->setPrevious(newNode);
+            internalSize++;
             return true;
         }
 
-        if (position == size && size > 0) {    // Tail
-            newNode->setParentNode(tail);
-            getNode(position - 1)->setChildNode(newNode);
+        if (position == size() && size() > 0) {    // Tail
+            newNode->setPrevious(tail);
+            getNode(position - 1)->setNext(newNode);
             tail = newNode;
-            size++;
+            internalSize++;
             return true;
         }
 
@@ -310,150 +263,37 @@ class linked_list {
         return false;
     }
 
-    bool push_front(const T & object) {
-        return insert(0, object);
+    bool insert(const int& position, const T* object) {
+        return insert(position, *object);
     }
 
-    bool push_back(const T & object) {
-        return insert(size, object);
+    bool replace(const int& position, const T& data) {
+        Node* newNode = new Node(data);
+        Node* oldNode = getNode(position);
+        Node* previous = oldNode->getPrevious();
+        Node* next = oldNode->getNext();
+        newNode->setPrevious(previous);
+        previous->setNext(newNode);
+        newNode->setNext(next);
+        next->setPrevious(newNode);
+        delete oldNode;
+        return true;
+
     }
 
-    int findNode(const T & node, const int & position = 0) const {
-        if (position >= size || position < 0) {
-            // Throw error, out of bounds
-            std::ostringstream stream;
-            stream << "linked_list findNode failed (position = " << position << ", size = " << size << ")";
-            std::cerr << stream.str() << std::endl;
-            throw std::out_of_range(stream.str());
-        }
-
-        for (int i = position; i < getSize(); i++) {
-            if (getData(i) == node) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    linked_list<int> findAllNodes(const T & node) const {
-        linked_list<int> list;
-        int position = findNode(node, 0);
-
-        while (position != -1) {
-            list.push_back(position);
-
-            if (position != getSize() - 1) {
-                position = findNode(node, position + 1);
-            } else {
-                position = -1;
-            }
-        }
-
-        return list;
-    }
-
-    int findNumAllNodes(const T & node) const {
-        return findAllNodes(node).getSize();
-    }
-
-    bool insert(const int & position, const T objects[], const int size) {
-        int i = 0;
-        bool shouldContinue = true;
-
-        while (i < size && shouldContinue) {
-            shouldContinue = insert(position + i, objects[i]);
-            i++;
-        }
-
-        return shouldContinue;
-    }
-
-    T remove(const int & position) {
-        if (position >= size || position < 0) {
-            // Throw error, out of bounds
-            std::ostringstream stream;
-            stream << "linked_list remove failed (position = " << position << ", size = " << size << ")";
-            std::cerr << stream.str() << std::endl;
-            throw std::out_of_range(stream.str());
-        }
-
-        Node * nodeToDelete;
-
-        if (position == 0 && size == 1) {   // Head, Size == 1
-            nodeToDelete = head;
-            T val = nodeToDelete->getData();
-            head = NULL;
-            tail = NULL;
-            size--;
-            // delete nodeToDelete;
-            return val;
-        }
-
-        if (position == 0 && size > 1) {    // Head, Size > 1
-            nodeToDelete = head;
-            T val = nodeToDelete->getData();
-            getNode(1)->clearParentNode();
-            head = getNode(1);
-            size--;
-            // delete nodeToDelete;
-            return val;
-        }
-
-        if (position < (size - 1) && position != 0) {   // Middle
-            nodeToDelete = getNode(position);
-            T val = nodeToDelete->getData();
-            getNode(position - 1)->setChildNode(getNode(position + 1));
-            getNode(position)->setParentNode(getNode(position - 1));
-            size--;
-            // delete nodeToDelete;
-            return val;
-        }
-
-        if (position == (size - 1)) {   // Tail
-            nodeToDelete = getNode(position);
-            T val = nodeToDelete->getData();
-            getNode(position - 1)->clearChildNode();
-            tail = getNode(position - 1);
-            size--;
-            // delete nodeToDelete;
-            return val;
-        }
-
-        std::ostringstream stream;
-        stream << "WARNING! remove not handled! Position = " << position << " Size = " << size;
-        std::cerr << stream.str() << std::endl;
-        throw std::out_of_range(stream.str());
-    }
-
-    int getSize() const {
-        return size;
-    }
-
-    // int size() const {
-
-        // return size; // I like to name variables such that they're useful
-        // The only reason this one is here is to make the testing program work
-
-    // }
-
-    T getData(const int & position) const {
-        if (position >= size || position < 0) {
+    const T& item_at(const int & position) const {
+        if (position >= size() || position < 0) {
             // Throw error
-            std::cerr << "linked_list getData failed (position = " << position << ", size = " << size << ")" << std::endl;
+            std::cerr << "linked_list item_at failed (position = " << position << ", internalSize = " << size() << ")" << std::endl;
             throw std::out_of_range("Position is not valid inside this linked_list");
         }
 
         return getNode(position)->getData();
     }
 
-    bool setData(const int & position, const T & data) {
-        return getNode(position)->setData(data);
-    }
-
-    bool nodeExists(const T & object) const {
-        for (int i = 0; i < size; i++) {
-            if (getData(i) == object) {
+    bool contains(const T & object) const {
+        for (int i = 0; i < size(); i++) {
+            if (item_at(i) == object) {
                 return true;
             }
         }
@@ -461,12 +301,24 @@ class linked_list {
         return false;
     }
 
-    T begin() const {
-        return head->getData();
+    const Node* begin() const {
+        return head;
     }
 
-    T end() const {
-        return tail->getData();
+    const Node* end() const {
+        return tail;
+    }
+
+    iterator getIterator(Node* node) {
+        return iterator(*this, node);
+    }
+
+    bool push_front(const T & object) {
+        return insert(0, object);
+    }
+
+    bool push_back(const T & object) {
+        return insert(size(), object);
     }
 
     T pop_front() {
@@ -474,61 +326,80 @@ class linked_list {
     }
 
     T pop_back() {
-        return remove(size - 1);
+        return remove(size() - 1);
     }
 
-    T item_at(const int & position) const {
-        if (position >= size || position < 0) {
-            // Throw error
-            std::cerr << "linked_list item_at failed (position = " << position << ", size = " << size << ")" << std::endl;
-            throw std::out_of_range("Position is not valid inside this linked_list");
+    T remove(const int& position) {
+        if (position >= size() || position < 0) {
+            // Throw error, out of bounds
+            std::ostringstream stream;
+            stream << "linked_list remove failed (position = " << position << ", internalSize = " << size() << ")";
+            std::cerr << stream.str() << std::endl;
+            throw std::out_of_range(stream.str());
         }
 
-        return getNode(position)->getData();
-    }
+        Node* nodeToDelete = getNode(position);
+        T val = nodeToDelete->getData();
 
-    T * toArray() const {
-        T * array = new T[size];
-
-        for (int i = 0; i < size; i++) {
-            array[i] = getNode(i)->getData();
+        if (position == 0 && size() == 1) {   // Head, Size == 1
+            head = NULL;
+            tail = NULL;
         }
 
-        return array;
+        if (position == 0 && size() > 1) {    // Head, Size > 1
+            head = getNode(1);
+            head->setPrevious(NULL);
+        }
+
+        if (position < (size() - 1) && position != 0) {   // Middle
+            getNode(position - 1)->setNext(getNode(position + 1));
+            getNode(position)->setPrevious(getNode(position - 1));
+        }
+
+        if (position == (size() - 1)) {   // Tail
+            getNode(position - 1)->setNext(NULL);
+            tail = getNode(position - 1);
+        }
+
+        internalSize--;
+        delete nodeToDelete;
+        return val;
     }
 
-    bool empty() const {
-        if (size == 0) {
+    const int size() const {
+        return internalSize;
+    }
+
+    void empty() {
+        while (size()) {
+            pop_front();
+        }
+    }
+
+    bool isEmpty() {
+        if (size() == 0) {
             return true;
         }
 
         return false;
     }
-
-    bool clear() {
-        while (getSize()) {
-            pop_front();
-        }
-
-        return true;
-    }
-
-    void print(std::ostream & stream) const {
-        if (size >= 0) {
-            stream << "{";
-            int i = 0;
-            while (i < size) {
-                getNode(i)->print(stream);
-                if (i != size - 1) {
-                    stream << ", ";
-                }
-
-                i++;
-            }
-
-            stream << "}";
-        } else {
-            stream << "Bad list data, size is negative.";
-        }
-    }
 };
+
+template <typename T>
+std::ostream& operator<< (std::ostream& os, linked_list<T>& list) {
+    std::stringstream ss;
+    std::stringstream newSS;
+    typename linked_list<T>::iterator it = list.getIterator(list.begin());
+    ss << "[";
+
+    for (; !it.endPassed(); it++) {
+        ss << *it << ", ";
+    }
+
+    std::string str = ss.str();
+    str = str.substr(0, str.size() - 2);
+    str += "]";
+    newSS << str;
+    os << newSS.str();
+    return os;
+}
