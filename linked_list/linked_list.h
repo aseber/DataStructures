@@ -66,7 +66,7 @@ class linked_list {
     const int size() const;
     void empty();
     bool isEmpty();
-    friend std::ostream& operator<< (std::ostream& os, const circular_linked_list<T>& list);
+    friend std::ostream& operator<< (std::ostream& os, const linked_list<T>& list);
 };
 
 #endif
