@@ -30,6 +30,8 @@ class linked_list {
         T remove();
         iterator& operator++();
         iterator operator++(int);
+        iterator& operator--();
+        iterator operator--(int);
         iterator& operator=(const Node* newItr);
         iterator& operator=(Node* newItr);
         bool operator==(const iterator& rhs) const;
@@ -42,7 +44,6 @@ class linked_list {
 
  private:
     const Node* getNode(const int& position) const;
-    const Node* getForwardNode(const int& position) const;
     T remove(Node* node);
     const int& getIndex(Node* node) const;
 
@@ -52,7 +53,7 @@ class linked_list {
     bool insert(const int& position, const T& object);
     bool insert(const int& position, const T* object);
     bool replace(const int& position, const T& data);
-    const T& item_at(const int & position) const;
+    const T& item_at(const int& position) const;
     bool contains(const T& object);
     const Node* begin() const;
     const Node* end() const;

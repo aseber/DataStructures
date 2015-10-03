@@ -2,9 +2,9 @@
 #include "linked_list.cpp"
 using namespace std;
 
-
 int main() {
     linked_list<int> test;
+    cout << test.isEmpty() << endl;
 
     cout << test << endl;
     test.insert(0, 1);
@@ -58,5 +58,4 @@ int main() {
         it.remove();
     }
     cout << test << endl;
-
 }

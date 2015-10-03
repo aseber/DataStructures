@@ -44,7 +44,7 @@ class linked_list {
             stream << getData();
         }
 
-        bool operator== (const Node & rhs) const {
+        bool operator== (const Node& rhs) const {
             if (object == rhs.getData() && previous == rhs.getPrevious() && next == rhs.getNext()) {
                 return true;
             }
@@ -52,7 +52,7 @@ class linked_list {
             return false;
         }
 
-        bool operator!= (const Node & rhs) const {
+        bool operator!= (const Node& rhs) const {
             return !(*this == rhs);
         }
 
@@ -94,6 +94,19 @@ class linked_list {
         }
 
         iterator operator++(int) {
+            iterator result(*this);
+            ++(*this);
+            return result;
+        }
+
+        iterator& operator--() {
+            if (itr == NULL) { throw std::invalid_argument("Iterator refers to a NULL pointer");}
+
+            itr = itr->getPrevious();
+            return *this;
+        }
+
+        iterator operator--(int) {
             iterator result(*this);
             ++(*this);
             return result;
@@ -169,37 +182,16 @@ class linked_list {
         return currentNode;
     }
 
-    Node* getForwardNode(const int& position) const {
-        if (position > (size() - 1)) {
-            // Throw error
-            std::ostringstream stream;
-            stream << "linked_list getForwardNode failed (position = " << position << ", internalSize = " << size() << ")";
-            std::cerr << stream.str() << std::endl;
-            throw std::out_of_range(stream.str());
-        }
-
-        Node* currentNode = head;
-        int i = 0;
-
-        while (i < position) {
-            currentNode = currentNode->getNext();
-            i++;
-        }
-
-        return currentNode;
-    }
-
     T remove(Node* node) {
         int index = getIndex(node);
         return remove(index);
     }
 
     const int getIndex(Node* node) {
-        if (node == head) { return -1; }
         int index = 0;
         iterator it = iterator(*this, begin());
 
-        for (; it != end(); it++) {
+        for (; it != NULL; it++) {
             if (it == node) {
                 return index;
             }
@@ -269,7 +261,7 @@ class linked_list {
 
     }
 
-    const T& item_at(const int & position) const {
+    const T& item_at(const int& position) const {
         if (position >= size() || position < 0) {
             // Throw error
             std::cerr << "linked_list item_at failed (position = " << position << ", internalSize = " << size() << ")" << std::endl;
@@ -279,9 +271,10 @@ class linked_list {
         return getNode(position)->getData();
     }
 
-    bool contains(const T & object) const {
-        for (int i = 0; i < size(); i++) {
-            if (item_at(i) == object) {
+    bool contains(const T& object) {
+        iterator it = getIterator(begin());
+        for (; it != NULL; it++) {
+            if (*it == object) {
                 return true;
             }
         }
@@ -301,11 +294,11 @@ class linked_list {
         return iterator(*this, node);
     }
 
-    bool push_front(const T & object) {
+    bool push_front(const T& object) {
         return insert(0, object);
     }
 
-    bool push_back(const T & object) {
+    bool push_back(const T& object) {
         return insert(size(), object);
     }
 
@@ -359,11 +352,7 @@ class linked_list {
     }
 
     bool isEmpty() {
-        if (size() == 0) {
-            return true;
-        }
-
-        return false;
+        return !size();
     }
 };
 
