@@ -232,7 +232,6 @@ class linked_list {
         } else {
             Node* current = getNode(position);
             Node* previous = current->getPrevious();
-            Node* next = current->getNext();
             newNode->setNext(current);
             newNode->setPrevious(previous);
             previous->setNext(newNode);
