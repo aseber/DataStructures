@@ -1,72 +1,73 @@
 // Doubly linked list
 
-#ifndef SEBER_LINKED_LIST
-#define SEBER_LINKED_LIST
+#ifndef SEBER_LINKED_LIST_H
+#define SEBER_LINKED_LIST_H
 
 template <typename T>
 class linked_list {
     class Node {
      public:
-        Node(const T& data, Node* parentNode = 0, Node* childNode = 0);
+        Node(const T&, Node*, Node*);
+        Node(const Node&);
         ~Node();
         const T& getData() const;
-        Node* getParentNode() const;
-        void setParentNode(Node* newNode);
-        Node* getChildNode() const;
-        void setChildNode(Node* newNode);
-        void print(std::ostream& stream);
-        bool operator== (const Node& rhs);
-        bool operator!= (const Node& rhs);
+        Node* getNext() const;
+        void setNext(Node*);
+        Node* getPrevious() const;
+        void setPrevious(Node*);
+        void print(std::ostream&) const;
+        Node& operator=(const Node*);
+        bool operator== (const Node&) const;
+        bool operator!= (const Node&) const;
         const T& operator*() const;
         const T& operator->() const;
+        friend std::ostream& operator<< (std::ostream&, const Node&);
     };
+
+    Node* getNode(const int&) const;
+    T remove(Node*);
+    const int getIndex(Node*);
 
  public:
     class iterator : public std::iterator<std::forward_iterator_tag, Node*> {
      public:
-        iterator(circular_linked_list<T>& tempList, const Node* temp);
-        iterator(circular_linked_list<T>& tempList, Node* temp);
-        iterator(const iterator& newItr);
-        T remove();
+        iterator(linked_list<T>&, const Node*);
+        iterator(const iterator&);
         iterator& operator++();
         iterator operator++(int);
         iterator& operator--();
         iterator operator--(int);
-        iterator& operator=(const Node* newItr);
-        iterator& operator=(Node* newItr);
-        bool operator==(const iterator& rhs) const;
-        bool operator==(const Node* rhs) const;
-        bool operator!=(const iterator& rhs) const;
-        bool operator!=(const Node* rhs) const;
+        iterator& operator=(const Node&);
+        bool operator==(const iterator&) const;
+        bool operator==(const Node&) const;
+        bool operator!=(const iterator&) const;
+        bool operator!=(const Node&) const;
         const T& operator*() const;
         const T& operator->() const;
     };
 
- private:
-    const Node* getNode(const int& position) const;
-    T remove(Node* node);
-    const int& getIndex(Node* node) const;
-
- public:
     linked_list();
+    linked_list(const linked_list<T>&);
     ~linked_list();
-    bool insert(const int& position, const T& object);
-    bool insert(const int& position, const T* object);
-    bool replace(const int& position, const T& data);
-    const T& item_at(const int& position) const;
-    bool contains(const T& object);
-    const Node* begin() const;
-    const Node* end() const;
-    iterator getIterator(Node* element);
-    bool push_front(const T& object);
-    bool push_back(const T& object);
+    bool insert(const int&, const T&);
+    bool replace(const int&, const T&);
+    const T& item_at(const int&) const;
+    bool contains(const T&);
+    Node* begin() const;
+    Node* front() const;
+    Node* back() const;
+    Node* end() const;
+    iterator getIterator(Node*);
+    linked_list<T>& operator=(const linked_list<T>&);
+    bool push_front(const T&);
+    bool push_back(const T&);
     T pop_front();
     T pop_back();
-    T remove(const int& position);
+    T remove(const int&);
     const int size() const;
     void empty();
     bool isEmpty();
-    friend std::ostream& operator<< (std::ostream& os, const linked_list<T>& list);
+    friend std::ostream& operator<< (std::ostream&, linked_list<T>&);
 };
 
 #endif

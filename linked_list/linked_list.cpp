@@ -2,7 +2,9 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <typeinfo>
+
+#ifndef SEBER_LINKED_LIST_CPP
+#define SEBER_LINKED_LIST_CPP
 
 template <typename T>
 class linked_list {
@@ -13,6 +15,8 @@ class linked_list {
 
      public:
         Node(const T& data, Node* tempPrevious = 0, Node* tempNext = 0) : object(new T(data)), previous(tempPrevious), next(tempNext) {}
+
+        Node(const Node& newNode) : object(new T(newNode.getData())), previous(newNode.getPrevious()), next(newNode.getNext()) {}
 
         ~Node() {
             delete object;
@@ -44,8 +48,15 @@ class linked_list {
             stream << getData();
         }
 
+        Node& operator=(const Node* otherNode) {
+            object = new T(otherNode->getData());
+            previous = otherNode->getPrevious();
+            next = otherNode->getNext();
+            return *this;
+        }
+
         bool operator== (const Node& rhs) const {
-            if (object == rhs.getData() && previous == rhs.getPrevious() && next == rhs.getNext()) {
+            if (*object == rhs.getData() && previous == rhs.getPrevious() && next == rhs.getNext()) {
                 return true;
             }
 
@@ -63,88 +74,7 @@ class linked_list {
         const T& operator->() const {
             return getData();
         }
-    };
 
- public:
-    class iterator : public std::iterator<std::forward_iterator_tag, Node*> {
-        linked_list<T>& list;
-        Node* itr;
-
-     public:
-        iterator(linked_list<T>& tempList, const Node* temp = NULL) : list(tempList), itr(temp) {}
-
-        iterator(linked_list<T>& tempList, Node* temp = NULL) : list(tempList), itr(temp) {}
-
-        iterator(const iterator& newItr) : list(newItr.list), itr(newItr.itr) {}
-
-        T remove() {
-            if (itr == NULL) { throw std::invalid_argument("Iterator refers to a NULL pointer");}
-
-            Node* nodeToDelete = itr;
-            operator++();
-            T val = list.remove(nodeToDelete);
-            return val;
-        }
-
-        iterator& operator++() {
-            if (itr == NULL) { throw std::invalid_argument("Iterator refers to a NULL pointer");}
-
-            itr = itr->getNext();
-            return *this;
-        }
-
-        iterator operator++(int) {
-            iterator result(*this);
-            ++(*this);
-            return result;
-        }
-
-        iterator& operator--() {
-            if (itr == NULL) { throw std::invalid_argument("Iterator refers to a NULL pointer");}
-
-            itr = itr->getPrevious();
-            return *this;
-        }
-
-        iterator operator--(int) {
-            iterator result(*this);
-            ++(*this);
-            return result;
-        }
-
-        iterator& operator=(const Node* newItr) {
-            itr = newItr;
-            return *this;
-        }
-
-        iterator& operator=(Node* newItr) {
-            itr = newItr;
-            return *this;
-        }
-
-        bool operator==(const iterator& rhs) const {
-            return itr == rhs.itr;
-        }
-
-        bool operator==(const Node* rhs) const {
-            return itr == rhs;
-        }
-
-        bool operator!=(const iterator& rhs) const {
-            return !(*this == rhs);
-        }
-
-        bool operator!=(const Node* rhs) const {
-            return !(*this == rhs);
-        }
-
-        const T& operator*() const {
-            return itr->getData();
-        }
-
-        const T& operator->() const {
-            return itr->getData();
-        }
     };
 
     Node* head;
@@ -191,7 +121,7 @@ class linked_list {
         int index = 0;
         iterator it = iterator(*this, begin());
 
-        for (; it != NULL; it++) {
+        for (; it != end(); it++) {
             if (it == node) {
                 return index;
             }
@@ -203,7 +133,78 @@ class linked_list {
     }
 
  public:
+    class iterator : public std::iterator<std::forward_iterator_tag, Node*> {
+        linked_list<T>& list;
+        Node* itr;
+
+     public:
+        iterator(linked_list<T>& tempList, Node* temp = NULL) : list(tempList), itr(temp) {}
+
+        iterator(const iterator& newItr) : list(newItr.list), itr(newItr.itr) {}
+
+        iterator& operator++() {
+            if (itr == NULL) { throw std::invalid_argument("Iterator refers to a NULL pointer");}
+
+            itr = itr->getNext();
+            return *this;
+        }
+
+        iterator operator++(int) {
+            iterator orig = *this;
+            ++(*this);
+            return orig;
+        }
+
+        iterator& operator--() {
+            if (itr == NULL) { throw std::invalid_argument("Iterator refers to a NULL pointer");}
+
+            itr = itr->getPrevious();
+            return *this;
+        }
+
+        iterator operator--(int) {
+            iterator orig = *this;
+            ++(*this);
+            return orig;
+        }
+
+        iterator& operator=(const Node& newItr) {
+            list = newItr.list;
+            itr = newItr.itr;
+            return *this;
+        }
+
+        bool operator==(const iterator& rhs) const {
+            return itr == rhs.itr;
+        }
+
+        bool operator==(const Node* rhs) const {
+            return itr == rhs;
+        }
+
+        bool operator!=(const iterator& rhs) const {
+            return !(*this == rhs);
+        }
+
+        bool operator!=(const Node* rhs) const {
+            return !(*this == rhs);
+        }
+
+        const T& operator*() const {
+            return itr->getData();
+        }
+
+        const T& operator->() const {
+            return itr->getData();
+        }
+    };
+
+ public:
     linked_list() : head(NULL), tail(NULL), internalSize(0) {}
+
+    linked_list(const linked_list<T>& otherList) : head(NULL), tail(NULL), internalSize(0) {
+        *this = otherList;
+    }
 
     ~linked_list() { empty(); }
 
@@ -242,10 +243,6 @@ class linked_list {
         return true;
     }
 
-    bool insert(const int& position, const T* object) {
-        return insert(position, *object);
-    }
-
     bool replace(const int& position, const T& data) {
         Node* newNode = new Node(data);
         Node* oldNode = getNode(position);
@@ -257,7 +254,6 @@ class linked_list {
         next->setPrevious(newNode);
         delete oldNode;
         return true;
-
     }
 
     const T& item_at(const int& position) const {
@@ -272,7 +268,7 @@ class linked_list {
 
     bool contains(const T& object) {
         iterator it = getIterator(begin());
-        for (; it != NULL; it++) {
+        for (; it != end(); it++) {
             if (*it == object) {
                 return true;
             }
@@ -285,12 +281,35 @@ class linked_list {
         return head;
     }
 
-    Node* end() const {
+    // useful if you are reverse iterating
+    Node* front() const {
+        return NULL;
+    }
+
+    // useful if you are reverse iterating
+    Node* back() const {
         return tail;
+    }
+
+    Node* end() const {
+        return NULL;
     }
 
     iterator getIterator(Node* node) {
         return iterator(*this, node);
+    }
+
+    linked_list<T>& operator=(linked_list<T>& otherList) {
+        iterator it = otherList.getIterator(otherList.begin());
+
+        for (; it != otherList.end(); it++) {
+            push_back(*it);
+        }
+
+        // head = otherList.begin();
+        // tail = otherList.end();
+        // internalSize = otherList.size() + 1;
+        return *this;
     }
 
     bool push_front(const T& object) {
@@ -356,12 +375,17 @@ class linked_list {
 };
 
 template <typename T>
+std::ostream& operator<< (std::ostream& os, const typename linked_list<T>::Node& node) {
+    return os << node.getData();
+}
+
+template <typename T>
 std::ostream& operator<< (std::ostream& os, linked_list<T>& list) {
     std::stringstream ss;
     std::stringstream newSS;
     typename linked_list<T>::iterator it = list.getIterator(list.begin());
     ss << "[";
-    for (; it != NULL; it++) {
+    for (; it != list.end(); it++) {
         ss << *it << ", ";
     }
 
@@ -372,3 +396,5 @@ std::ostream& operator<< (std::ostream& os, linked_list<T>& list) {
     os << newSS.str();
     return os;
 }
+
+#endif

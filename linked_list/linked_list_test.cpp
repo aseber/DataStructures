@@ -3,7 +3,9 @@
 using namespace std;
 
 int main() {
+
     linked_list<int> test;
+    linked_list<int> test2;
     cout << test.isEmpty() << endl;
 
     cout << test << endl;
@@ -53,9 +55,17 @@ int main() {
     test.insert(3, 4);
     test.insert(4, 5);
     cout << test << endl;
-    linked_list<int>::iterator it = test.getIterator(test.begin());
-    for (; it != NULL; ) {
-        it.remove();
-    }
+    test.empty();
     cout << test << endl;
+    test.insert(0, 2);
+    test.insert(1, 5);
+    cout << test << endl;
+    cout << test2 << endl;
+    // test2 = linked_list<int>(test);
+    test2 = test;
+    cout << test << endl;
+    cout << test2 << endl;
+    test.empty();
+    cout << test << endl;
+    cout << test2 << endl;
 }
