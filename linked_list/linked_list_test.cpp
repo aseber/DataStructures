@@ -1,5 +1,5 @@
 #include <iostream>
-#include "linked_list.cpp"
+#include "linked_list.inl"
 using namespace std;
 
 int main() {
