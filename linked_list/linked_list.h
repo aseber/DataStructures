@@ -1,7 +1,22 @@
-// Doubly linked list
+/*
+*
+* Name: Austin Seber
+*
+* UFID: 01516234
+*
+* Gator ID: aseber
+*
+* Discussion Section: 13A8
+*
+*/
 
 #ifndef SEBER_LINKED_LIST_H
 #define SEBER_LINKED_LIST_H
+
+#include <stdexcept>
+#include <iostream>
+#include <string>
+#include <sstream>
 
 template <typename T>
 class linked_list {
@@ -21,7 +36,8 @@ class linked_list {
         bool operator!= (const Node&) const;
         const T& operator*() const;
         const T& operator->() const;
-        friend std::ostream& operator<< (std::ostream&, const Node&);
+        template <typename Y>
+        friend std::ostream& operator<< (std::ostream&, const typename linked_list<Y>::Node&);
     };
 
     Node* getNode(const int&) const;
@@ -31,7 +47,7 @@ class linked_list {
  public:
     class iterator : public std::iterator<std::forward_iterator_tag, Node*> {
      public:
-        iterator(linked_list<T>&, const Node*);
+        iterator(linked_list<T>&, Node*);
         iterator(const iterator&);
         iterator& operator++();
         iterator operator++(int);
@@ -39,15 +55,16 @@ class linked_list {
         iterator operator--(int);
         iterator& operator=(const Node&);
         bool operator==(const iterator&) const;
-        bool operator==(const Node&) const;
+        bool operator==(const Node*) const;
         bool operator!=(const iterator&) const;
-        bool operator!=(const Node&) const;
+        bool operator!=(const Node*) const;
         const T& operator*() const;
         const T& operator->() const;
     };
 
+ public:
     linked_list();
-    linked_list(const linked_list<T>&);
+    linked_list(linked_list<T>&);
     ~linked_list();
     bool insert(const int&, const T&);
     bool replace(const int&, const T&);
@@ -67,7 +84,8 @@ class linked_list {
     const int size() const;
     void empty();
     bool isEmpty();
-    friend std::ostream& operator<< (std::ostream&, linked_list<T>&);
+    template <typename Y>
+    friend std::ostream& operator<< (std::ostream&, linked_list<Y>&);
 };
 
 #endif

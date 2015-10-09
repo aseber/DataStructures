@@ -1,10 +1,22 @@
+/*
+*
+* Name: Austin Seber
+*
+* UFID: 01516234
+*
+* Gator ID: aseber
+*
+* Discussion Section: 13A8
+*
+*/
+
+#ifndef SEBER_LINKED_LIST_CPP
+#define SEBER_LINKED_LIST_CPP
+
 #include <stdexcept>
 #include <iostream>
 #include <string>
 #include <sstream>
-
-#ifndef SEBER_LINKED_LIST_CPP
-#define SEBER_LINKED_LIST_CPP
 
 template <typename T>
 class linked_list {
@@ -202,7 +214,7 @@ class linked_list {
  public:
     linked_list() : head(NULL), tail(NULL), internalSize(0) {}
 
-    linked_list(const linked_list<T>& otherList) : head(NULL), tail(NULL), internalSize(0) {
+    linked_list(linked_list<T>& otherList) : head(NULL), tail(NULL), internalSize(0) {
         *this = otherList;
     }
 
@@ -299,16 +311,15 @@ class linked_list {
         return iterator(*this, node);
     }
 
-    linked_list<T>& operator=(linked_list<T>& otherList) {
-        iterator it = otherList.getIterator(otherList.begin());
-
-        for (; it != otherList.end(); it++) {
-            push_back(*it);
+    linked_list<T>& operator=(const linked_list<T>& otherList) {
+        empty();
+        for (int index = 0; index < otherList.size(); index++) {
+            push_back(otherList.item_at(index));
         }
 
-        // head = otherList.begin();
-        // tail = otherList.end();
-        // internalSize = otherList.size() + 1;
+        // This method is terrible. It should be using
+        // an iterator, but the iterators are not const!
+
         return *this;
     }
 
