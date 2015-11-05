@@ -21,19 +21,19 @@ class min_priority_heap_queue {
     int currentCapacity;
     T** arrayOfElements;
 
-    int findParent(const int& currentElement) {
+    int findParent(const int& currentElement) const {
         return ((currentElement) / 2);
     }
 
-    int findLeftChild(const int& currentElement) {
+    int findLeftChild(const int& currentElement) const {
         return (currentElement + 1)*2 - 1;
     }
 
-    int findRightChild(const int& currentElement) {
+    int findRightChild(const int& currentElement) const {
         return (currentElement + 1)*2;
     }
 
-    int compareElements(const int& element1, const int& element2) {
+    int compareElements(const int& element1, const int& element2) const {
         if (*arrayOfElements[element1] > *arrayOfElements[element2]) {
             return 1;
         } else if (*arrayOfElements[element1] < *arrayOfElements[element2]) {
@@ -64,15 +64,7 @@ class min_priority_heap_queue {
         bool rightChildExists = rightChild < currentCapacity;
 
         while((leftChildExists && rightChildExists) && (compareElements(currentElement, leftChild) == 1 || compareElements(currentElement, rightChild) == 1)) {
-            // std::cout << "element: " << currentElement << " (" << *arrayOfElements[currentElement] << ")" << std::endl;
-            // std::cout << "left: " << leftChild << " (" << *arrayOfElements[leftChild] << ")" << std::endl;
-            // std::cout << "right: " << rightChild << " (" << *arrayOfElements[rightChild] << ")" << std::endl;
-            // std::cout << "leftExist: " << leftChildExists << std::endl;
-            // std::cout << "rightExist: " << rightChildExists << std::endl;
-
             if (*arrayOfElements[leftChild] < *arrayOfElements[rightChild]) {
-                // std::cout << "Shift down left" << std::endl;
-                // Push up left, sift down
                 T* temp = arrayOfElements[currentElement];
                 arrayOfElements[currentElement] = arrayOfElements[leftChild];
                 arrayOfElements[leftChild] = temp;
@@ -82,8 +74,6 @@ class min_priority_heap_queue {
                 leftChildExists = leftChild < currentCapacity;
                 rightChildExists = rightChild < currentCapacity;
             } else {
-                // std::cout << "Shift down right" << std::endl;
-                // Push up right, sift down
                 T* temp = arrayOfElements[currentElement];
                 arrayOfElements[currentElement] = arrayOfElements[rightChild];
                 arrayOfElements[rightChild] = temp;
@@ -103,11 +93,11 @@ class min_priority_heap_queue {
         delete[] arrayOfElements;
     }
 
-    int size() {
+    const int& size() const {
         return currentCapacity;
     }
 
-    bool isEmpty() {
+    bool isEmpty() const {
         if (!currentCapacity) {
             return true;
         }
@@ -134,7 +124,7 @@ class min_priority_heap_queue {
         currentCapacity++;
     }
 
-    const T& top() {
+    const T& top() const {
         if (isEmpty()) {
             std::ostringstream stream;
             stream << "min_priority_heap_queue top failed. Queue is empty";

@@ -1,3 +1,15 @@
+/*
+ *
+ * Name: Austin Seber
+ *
+ * UFID: 01516234
+ *
+ * Gator ID: aseber
+ *
+ * Discussion Section: 13A8
+ *
+ */
+
 #include <stdexcept>
 #include <iostream>
 #include <string>
