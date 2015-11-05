@@ -10,6 +10,9 @@
  *
  */
 
+#ifndef SEBER_MIN_PRIORITY_HEAP_QUEUE_H
+#define SEBER_MIN_PRIORITY_HEAP_QUEUE_H
+
 #include <stdexcept>
 #include <iostream>
 #include <string>
@@ -152,3 +155,5 @@ class min_priority_heap_queue {
         return elementToRemove;
     }
 };
+
+#endif

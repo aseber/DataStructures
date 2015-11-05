@@ -10,6 +10,9 @@
 *
 */
 
+#ifndef SEBER_MIN_PRIORITY_TREE_QUEUE_H
+#define SEBER_MIN_PRIORITY_TREE_QUEUE_H
+
 #include <algorithm>
 #include <stdexcept>
 #include <iostream>
@@ -134,3 +137,5 @@ class min_priority_tree_queue {
         return leftBranch;
     }
 };
+
+#endif

@@ -10,8 +10,8 @@
 *
 */
 
-#ifndef SEBER_LINKED_LIST_CPP
-#define SEBER_LINKED_LIST_CPP
+#ifndef SEBER_LINKED_LIST_H
+#define SEBER_LINKED_LIST_H
 
 #include <stdexcept>
 #include <iostream>
@@ -66,12 +66,6 @@ class linked_list {
             next = otherNode->getNext();
             return *this;
         }
-
-        Node n1;
-        Node n2;
-
-        std::cout << (n1 == n2) << std::endl;
-        std::cout << n1.operator==(n2) << std::endl;
 
         bool operator== (const Node& rhs) const {
             if (*object == rhs.getData() && previous == rhs.getPrevious() && next == rhs.getNext()) {
@@ -300,12 +294,12 @@ class linked_list {
     }
 
     // useful if you are reverse iterating
-    Node* front() const {
+    Node* begin_reverse() const {
         return NULL;
     }
 
     // useful if you are reverse iterating
-    Node* back() const {
+    Node* end_reverse() const {
         return tail;
     }
 
@@ -319,6 +313,7 @@ class linked_list {
 
     linked_list<T>& operator=(const linked_list<T>& otherList) {
         empty();
+
         for (int index = 0; index < otherList.size(); index++) {
             push_back(otherList.item_at(index));
         }

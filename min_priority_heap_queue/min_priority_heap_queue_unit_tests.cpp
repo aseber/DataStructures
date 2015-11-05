@@ -20,7 +20,6 @@ using namespace std;
 int main() {
 
     min_priority_heap_queue<int> min_heap = min_priority_heap_queue<int>(10);
-    // cout << min_heap.isEmpty() << endl;
     min_heap.push(8);
     cout << min_heap.top() << endl;
     min_heap.push(7);
