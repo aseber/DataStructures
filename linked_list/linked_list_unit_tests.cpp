@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
-#include "linked_list.inl"
+#include "linked_list.h"
 
 /*
  * Note about CATCH: for each SECTION, the TEST_CASE is executed from the
