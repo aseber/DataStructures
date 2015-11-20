@@ -1,14 +1,14 @@
 /*
-*
-* Name: Austin Seber
-*
-* UFID: 01516234
-*
-* Gator ID: aseber
-*
-* Discussion Section: 13A8
-*
-*/
+ *
+ * Name: Austin Seber
+ *
+ * UFID: 01516234
+ *
+ * Gator ID: aseber
+ *
+ * Discussion Section: 13A8
+ *
+ */
 
 #ifndef SEBER_MIN_PRIORITY_TREE_QUEUE_H
 #define SEBER_MIN_PRIORITY_TREE_QUEUE_H
@@ -105,7 +105,9 @@ class min_priority_tree_queue {
         }
 
         T value = T(root->value);
-        root = meld(root->leftChild, root->rightChild);
+        Node<T>* temp = meld(root->leftChild, root->rightChild);
+        delete root;
+        root = temp;
         internalSize--;
         return value;
     }
